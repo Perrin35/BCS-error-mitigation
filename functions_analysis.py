@@ -110,22 +110,23 @@ def noisy_trotter(errors,initial_step,final_step,meas_list,measurement, dt, PATH
             lay=[0,1,2]
         T=dt*t
         qc=QuantumCircuit.from_qasm_file('data/'+measurement+'/T='+str(round(T,1))+PATH)
-        nb_qubits=len(used_qubits(qc))
-                       
+        qb_used=used_qubits(qc)
+        nb_qubits=len(qb_used)
+        
         #Copy the circuit to remove the idle qubits and measurements
         qc2=QuantumCircuit(nb_qubits)
         for gate in qc:
             if gate[0].name=='x':
-                qc2.x(gate[1][0].index)
+                qc2.x(qb_used.index(gate[1][0].index))
             if gate[0].name=='sx':
-                qc2.sx(gate[1][0].index)
+                qc2.sx(qb_used.index(gate[1][0].index))
             if gate[0].name=='rz':
                 theta=gate[0].params[0]
-                qc2.rz(theta,gate[1][0].index)
+                qc2.rz(theta,qb_used.index(gate[1][0].index))
             if gate[0].name=='barrier':
                 qc2.barrier()
             if gate[0].name=='cx':
-                qc2.cx(gate[1][0].index,gate[1][1].index)
+                qc2.cx(qb_used.index(gate[1][0].index),qb_used.index(gate[1][1].index))
         qc2=transpile(qc2,sim, optimization_level=0)
                        
         #Compute the density matrix
@@ -272,22 +273,23 @@ def noisy_estimation_circuit(errors,initial_step, final_step, meas_list, dt, PAT
         T=dt*t
         
         qc=QuantumCircuit.from_qasm_file('data/ZZZ/T='+str(round(T,1))+PATH)
-        nb_qubits=len(used_qubits(qc))
+        qb_used=used_qubits(qc)
+        nb_qubits=len(qb_used)
                           
         #Copy the circuit to remove the idle qubits and measurements
         qc2=QuantumCircuit(nb_qubits)
         for gate in qc:
             if gate[0].name=='x':
-                qc2.x(gate[1][0].index)
+                qc2.x(qb_used.index(gate[1][0].index))
             if gate[0].name=='sx':
-                qc2.sx(gate[1][0].index)
+                qc2.sx(qb_used.index(gate[1][0].index))
             if gate[0].name=='rz':
                 theta=gate[0].params[0]
-                qc2.rz(theta,gate[1][0].index)
+                qc2.rz(qb_used.index(gate[1][0].index))
             if gate[0].name=='barrier':
                 qc2.barrier()
             if gate[0].name=='cx':
-                qc2.cx(gate[1][0].index,gate[1][1].index)
+                qc2.cx(qb_used.index(gate[1][0].index),qb_used.index(gate[1][1].index))
                         
         #Compute the density matrix
         qc2=transpile(qc2,sim, optimization_level=0)
